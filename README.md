@@ -17,7 +17,7 @@ A webcam (or another realtime image capturing device) is also required.
 
 # How to use
 After running *main.py*, you will see the image captured by webcam on the screen (if multiple webcams are installed, you may choose the device by changing the *CAM_DEVICE_INDEX* variable in *main.py*). Do the following to test the program:
-1. Move your hand slowly in front of the webcam. A bounding box should appear around your hand. If it does not, try decreasing the *DETECT_THRESH* variable (direct detection threshold) in *main.py*. Please also note that currently this program is not able to detect/track more than one hands simultaneously, so just one hand should be present in the scene.
+1. Move your hand slowly in front of the webcam. A bounding box should appear around your hand. If it does not, try decreasing the *DETECT_THRESH* variable (direct detection threshold) in *main.py*. Please also note that currently this program is not able to detect/track more than one hand simultaneously, so just a single hand should be present in the scene.
 2. In order to start drawing, you must make a ‘signal’, which means closing your hand (making a fist) and reopening it. Repeat this several times with a moderate speed until the signal is detected. The color of the bounding box will change when the signal is detected.
 3. Move your hand gently to draw! The hand should be open while drawing.
 4. When you want to finish drawing, make a signal (similar to step 2) again. The color of the bounding box will change to what was before.
@@ -34,6 +34,7 @@ Note: based on my experience, currently the light conditions have a considerable
 # The Algorithm
 The hand detector neural network is a SSD network, which outputs a set of bounding boxes with their associated confidence scores (in [0,1] range). The bounding box which has the highest score will be called the best output of the network.
 When the confidence score of the best output of hand detector network exceeds a fixed threshold value (direct detection threshold), we say that a ‘direct detection’ has happened. The algorithm enters the main loop after the first direct detection. When this happens, a variable holding the coordinates of the bounding box around the hand is initialized with the best output of the network. Then, this variable is updated on every iteration in the following way:
+
 If there is a direct detection, the variable is updated to the best output of the hand detector network. Otherwise, a Bayesian tracking algorithm is used to estimate the coordinates of the bounding box and update the variable, based on its value in the previous iteration and the current outputs of the hand detector network.
 When the user presses the halt button, the main loop is terminated.
 
@@ -62,7 +63,7 @@ The detection algorithm watches the outputs of the neural network over several i
 
 In practice, it was observed that the outputs of the classifier network were quite noisy. For example, when the hand remained in the ‘fist’ state, the classifier would output ‘fist’ most of the times, but sometimes it also resulted in ‘normal’ at one or two frames (iterations) and then quickly returned to the true state. To address this, a type of smoothing was used. The basic idea is that if the hand is currently in normal/fist state, it is more likely to remain in the same state at the next frame. In other words, we can consider a hidden Markov model with two states, where the transition probability from each state to itself is higher than its transition probability to the other state. This idea has been currently implemented by the following simple rule: in order to increment the counter, it is not enough that the winner class (normal/fist) changes, but the probability of the new winner class should be also higher than the other class by a fixed threshold value.
 
-The *fistdetector.py* file is the implementation of the neural network classifier. The complete signal detector has been implemented as the class *SignalDetector* in *detector.py*. 
+The *fistdetector.py* file is the implementation of the neural network classifier. The trained network has been saved in *fist_network**** files. The complete signal detector has been implemented as the class *SignalDetector* in *detector.py*.
 
 # References
 This project uses some material (including a trained TensorFlow model) and code form the following work:
