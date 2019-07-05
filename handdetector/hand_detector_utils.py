@@ -41,7 +41,6 @@ category_index = label_map_util.create_category_index(categories)
 def load_inference_graph():
 
     # load frozen tensorflow model into memory
-    print("> ====== loading HAND frozen graph into memory")
     detection_graph = tf.Graph()
     with detection_graph.as_default():
         od_graph_def = tf.GraphDef()
@@ -50,7 +49,7 @@ def load_inference_graph():
             od_graph_def.ParseFromString(serialized_graph)
             tf.import_graph_def(od_graph_def, name='')
         sess = tf.Session(graph=detection_graph)
-    print(">  ====== Hand Inference graph loaded.")
+    print("SSD hand detector frozen graph loaded.")
     return detection_graph, sess
 
 
