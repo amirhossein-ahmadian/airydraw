@@ -3,6 +3,11 @@
 # Draw using your hand on the air, and have fun!
 # https://github.com/amirhossein-ahmadian/airydraw
 # MIT License
+#
+#Hand detection SSD model from
+#Victor Dibia, HandTrack
+#https://github.com/victordibia/handtracking
+
 
 
 import cv2
